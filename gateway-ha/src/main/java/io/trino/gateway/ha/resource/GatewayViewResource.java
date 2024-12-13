@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
 import static java.util.Objects.requireNonNull;
 
 @Path("/trino-gateway")
@@ -97,7 +98,7 @@ public class GatewayViewResource
                 .getAllBackends()
                 .forEach(
                         backend -> {
-                            urlToNameMap.put(backend.getProxyTo(), backend.getName());
+                            urlToNameMap.put(removeTrailingSlash(backend.getProxyTo()), backend.getName());
                         });
 
         Map<String, Integer> clusterToQueryCount = new HashMap<>();

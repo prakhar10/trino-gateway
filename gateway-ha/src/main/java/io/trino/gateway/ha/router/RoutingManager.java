@@ -35,6 +35,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
+
 /**
  * This class performs health check, stats counts for each backend and provides a backend given
  * request object. Default implementation comes here.
@@ -89,7 +91,7 @@ public abstract class RoutingManager
             throw new IllegalStateException("Number of active backends found zero");
         }
         int backendId = Math.abs(RANDOM.nextInt()) % backends.size();
-        return backends.get(backendId).getProxyTo();
+        return removeTrailingSlash(backends.get(backendId).getProxyTo());
     }
 
     /**
@@ -105,7 +107,7 @@ public abstract class RoutingManager
             return provideAdhocBackend(user);
         }
         int backendId = Math.abs(RANDOM.nextInt()) % backends.size();
-        return backends.get(backendId).getProxyTo();
+        return removeTrailingSlash(backends.get(backendId).getProxyTo());
     }
 
     /**
@@ -144,11 +146,11 @@ public abstract class RoutingManager
     protected String findBackendForUnknownQueryId(String queryId)
     {
         List<ProxyBackendConfiguration> backends = gatewayBackendManager.getAllBackends();
-
         Map<String, Future<Integer>> responseCodes = new HashMap<>();
         try {
             for (ProxyBackendConfiguration backend : backends) {
-                String target = backend.getProxyTo() + "/v1/query/" + queryId;
+                String backendProxyToUrl = removeTrailingSlash(backend.getProxyTo());
+                String target = backendProxyToUrl + "/v1/query/" + queryId;
 
                 Future<Integer> call =
                         executorService.submit(
@@ -160,7 +162,7 @@ public abstract class RoutingManager
                                     conn.setRequestMethod(HttpMethod.HEAD);
                                     return conn.getResponseCode();
                                 });
-                responseCodes.put(backend.getProxyTo(), call);
+                responseCodes.put(backendProxyToUrl, call);
             }
             for (Map.Entry<String, Future<Integer>> entry : responseCodes.entrySet()) {
                 if (entry.getValue().isDone()) {
@@ -177,7 +179,7 @@ public abstract class RoutingManager
             log.warn("Query id [%s] not found", queryId);
         }
         // Fallback on first active backend if queryId mapping not found.
-        return gatewayBackendManager.getActiveAdhocBackends().get(0).getProxyTo();
+        return removeTrailingSlash(gatewayBackendManager.getActiveAdhocBackends().get(0).getProxyTo());
     }
 
     // Predicate helper function to remove the backends from the list

@@ -32,6 +32,7 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class ClusterStatsJdbcMonitor
@@ -65,7 +66,7 @@ public class ClusterStatsJdbcMonitor
     @Override
     public ClusterStats monitor(ProxyBackendConfiguration backend)
     {
-        String url = backend.getProxyTo();
+        String url = removeTrailingSlash(backend.getProxyTo());
         ClusterStats.Builder clusterStats = ClusterStatsMonitor.getClusterStatsBuilder(backend);
         String jdbcUrl;
         try {

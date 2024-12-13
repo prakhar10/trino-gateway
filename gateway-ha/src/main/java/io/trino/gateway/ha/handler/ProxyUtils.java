@@ -122,4 +122,9 @@ public final class ProxyUtils
     {
         return backendHost + request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
     }
+
+    public static String removeTrailingSlash(String url)
+    {
+        return url.replaceAll("/$", "");
+    }
 }

@@ -15,6 +15,8 @@ package io.trino.gateway.ha.clustermonitor;
 
 import io.trino.gateway.ha.config.ProxyBackendConfiguration;
 
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
+
 public interface ClusterStatsMonitor
 {
     ClusterStats monitor(ProxyBackendConfiguration backend);
@@ -22,8 +24,8 @@ public interface ClusterStatsMonitor
     static ClusterStats.Builder getClusterStatsBuilder(ProxyBackendConfiguration backend)
     {
         ClusterStats.Builder builder = ClusterStats.builder(backend.getName());
-        builder.proxyTo(backend.getProxyTo());
-        builder.externalUrl(backend.getExternalUrl());
+        builder.proxyTo(removeTrailingSlash(backend.getProxyTo()));
+        builder.externalUrl(removeTrailingSlash(backend.getExternalUrl()));
         builder.routingGroup(backend.getRoutingGroup());
         return builder;
     }

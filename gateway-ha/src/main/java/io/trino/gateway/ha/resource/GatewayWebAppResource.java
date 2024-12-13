@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
@@ -95,7 +96,7 @@ public class GatewayWebAppResource
             backendResponse.setQueued(backendState.queuedQueryCount());
             backendResponse.setRunning(backendState.runningQueryCount());
             backendResponse.setName(b.getName());
-            backendResponse.setProxyTo(b.getProxyTo());
+            backendResponse.setProxyTo(removeTrailingSlash(b.getProxyTo()));
             backendResponse.setActive(b.isActive());
             backendResponse.setStatus(backendState.trinoStatus().toString());
             backendResponse.setRoutingGroup(b.getRoutingGroup());

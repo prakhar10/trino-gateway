@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
 import static java.util.Objects.requireNonNull;
 
 public class HaGatewayManager
@@ -94,19 +95,23 @@ public class HaGatewayManager
     @Override
     public ProxyBackendConfiguration addBackend(ProxyBackendConfiguration backend)
     {
-        dao.create(backend.getName(), backend.getRoutingGroup(), backend.getProxyTo(), backend.getExternalUrl(), backend.isActive());
+        String backendProxyTo = removeTrailingSlash(backend.getProxyTo());
+        String backendExternalUrl = removeTrailingSlash(backend.getExternalUrl());
+        dao.create(backend.getName(), backend.getRoutingGroup(), backendProxyTo, backendExternalUrl, backend.isActive());
         return backend;
     }
 
     @Override
     public ProxyBackendConfiguration updateBackend(ProxyBackendConfiguration backend)
     {
+        String backendProxyTo = removeTrailingSlash(backend.getProxyTo());
+        String backendExternalUrl = removeTrailingSlash(backend.getExternalUrl());
         GatewayBackend model = dao.findFirstByName(backend.getName());
         if (model == null) {
-            dao.create(backend.getName(), backend.getRoutingGroup(), backend.getProxyTo(), backend.getExternalUrl(), backend.isActive());
+            dao.create(backend.getName(), backend.getRoutingGroup(), backendProxyTo, backendExternalUrl, backend.isActive());
         }
         else {
-            dao.update(backend.getName(), backend.getRoutingGroup(), backend.getProxyTo(), backend.getExternalUrl(), backend.isActive());
+            dao.update(backend.getName(), backend.getRoutingGroup(), backendProxyTo, backendExternalUrl, backend.isActive());
         }
         return backend;
     }

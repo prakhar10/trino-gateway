@@ -37,6 +37,7 @@ import static io.airlift.http.client.HttpStatus.fromStatusCode;
 import static io.trino.gateway.ha.handler.HttpUtils.UI_API_QUEUED_LIST_PATH;
 import static io.trino.gateway.ha.handler.HttpUtils.UI_API_STATS_PATH;
 import static io.trino.gateway.ha.handler.HttpUtils.UI_LOGIN_PATH;
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
 import static java.util.Objects.requireNonNull;
 
 public class ClusterStatsHttpMonitor
@@ -74,8 +75,8 @@ public class ClusterStatsHttpMonitor
                     .queuedQueryCount((int) result.get("queuedQueries"))
                     .runningQueryCount((int) result.get("runningQueries"))
                     .trinoStatus(activeWorkers > 0 ? TrinoStatus.HEALTHY : TrinoStatus.UNHEALTHY)
-                    .proxyTo(backend.getProxyTo())
-                    .externalUrl(backend.getExternalUrl())
+                    .proxyTo(removeTrailingSlash(backend.getProxyTo()))
+                    .externalUrl(removeTrailingSlash(backend.getExternalUrl()))
                     .routingGroup(backend.getRoutingGroup());
         }
         catch (Exception e) {
@@ -129,14 +130,14 @@ public class ClusterStatsHttpMonitor
 
     private String queryCluster(ProxyBackendConfiguration backend, String path)
     {
-        String loginUrl = backend.getProxyTo() + UI_LOGIN_PATH;
+        String loginUrl = removeTrailingSlash(backend.getProxyTo()) + UI_LOGIN_PATH;
         OkHttpClient client = acquireClientWithCookie(loginUrl);
         if (client == null) {
             log.error("Client received is null");
             return null;
         }
 
-        String targetUrl = backend.getProxyTo() + path;
+        String targetUrl = removeTrailingSlash(backend.getProxyTo()) + path;
         Request request = new Request.Builder()
                 .url(HttpUrl.parse(targetUrl))
                 .get()

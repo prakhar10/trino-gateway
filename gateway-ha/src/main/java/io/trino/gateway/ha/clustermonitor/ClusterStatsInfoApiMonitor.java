@@ -28,6 +28,7 @@ import static io.airlift.http.client.JsonResponseHandler.createJsonResponseHandl
 import static io.airlift.http.client.Request.Builder.prepareGet;
 import static io.airlift.json.JsonCodec.jsonCodec;
 import static io.trino.gateway.ha.clustermonitor.MonitorUtils.shouldRetry;
+import static io.trino.gateway.ha.handler.ProxyUtils.removeTrailingSlash;
 import static java.util.Objects.requireNonNull;
 
 public class ClusterStatsInfoApiMonitor
@@ -47,9 +48,11 @@ public class ClusterStatsInfoApiMonitor
     @Override
     public ClusterStats monitor(ProxyBackendConfiguration backend)
     {
-        return ClusterStats.builder(backend.getName()).trinoStatus(checkStatus(backend.getProxyTo()))
-                .proxyTo(backend.getProxyTo())
-                .externalUrl(backend.getExternalUrl())
+        String backendProxyToUrl = removeTrailingSlash(backend.getProxyTo());
+        String backendExternalUrl = removeTrailingSlash(backend.getExternalUrl());
+        return ClusterStats.builder(backend.getName()).trinoStatus(checkStatus(backendProxyToUrl))
+                .proxyTo(backendProxyToUrl)
+                .externalUrl(backendExternalUrl)
                 .routingGroup(backend.getRoutingGroup()).build();
     }
 
