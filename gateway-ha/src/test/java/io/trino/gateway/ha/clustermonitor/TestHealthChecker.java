@@ -36,7 +36,7 @@ public class TestHealthChecker
         Notifier notifier = Mockito.mock(Notifier.class);
         HealthChecker healthChecker = new HealthChecker(notifier);
         ClusterStats clusterStats = mock(ClusterStats.class);
-        when(clusterStats.healthy()).thenReturn(false);
+        when(clusterStats.trinoStatus() == TrinoStatus.UNHEALTHY).thenReturn(false);
         when(clusterStats.clusterId()).thenReturn("testCluster");
 
         healthChecker.observe(Collections.singletonList(clusterStats));
@@ -50,7 +50,7 @@ public class TestHealthChecker
         Notifier notifier = Mockito.mock(Notifier.class);
         HealthChecker healthChecker = new HealthChecker(notifier);
         ClusterStats clusterStats = mock(ClusterStats.class);
-        when(clusterStats.healthy()).thenReturn(true);
+        when(clusterStats.trinoStatus() == TrinoStatus.HEALTHY).thenReturn(true);
         when(clusterStats.clusterId()).thenReturn("testCluster");
         when(clusterStats.queuedQueryCount()).thenReturn(101);
 
@@ -65,7 +65,7 @@ public class TestHealthChecker
         Notifier notifier = Mockito.mock(Notifier.class);
         HealthChecker healthChecker = new HealthChecker(notifier);
         ClusterStats clusterStats = mock(ClusterStats.class);
-        when(clusterStats.healthy()).thenReturn(true);
+        when(clusterStats.trinoStatus() == TrinoStatus.HEALTHY).thenReturn(true);
         when(clusterStats.clusterId()).thenReturn("testCluster");
         when(clusterStats.numWorkerNodes()).thenReturn(0);
 

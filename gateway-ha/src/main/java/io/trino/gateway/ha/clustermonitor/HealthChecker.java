@@ -34,7 +34,7 @@ public class HealthChecker
     public void observe(List<ClusterStats> clustersStats)
     {
         for (ClusterStats clusterStats : clustersStats) {
-            if (!clusterStats.healthy()) {
+            if (clusterStats.trinoStatus() == TrinoStatus.UNHEALTHY) {
                 notifyUnhealthyCluster(clusterStats);
             }
             else {
@@ -87,7 +87,7 @@ public class HealthChecker
                 External URL : %s
                 """,
                 clusterStats.clusterId(),
-                clusterStats.healthy(),
+                clusterStats.trinoStatus(),
                 clusterStats.routingGroup(),
                 clusterStats.numWorkerNodes(),
                 clusterStats.runningQueryCount(),
